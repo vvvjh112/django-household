@@ -11,11 +11,16 @@ from .models import *
 
 
 class TableList(APIView):
-    def get(self, request, path):
+    def get(self, request, uid):
         # test = Table.objects
         # pds.test_func("C3456Users56lleel56Desktop56test.db")
-        pds.test_func(path)
-        test = resultTB.objects
-        serializer = ResultSerializer(test, many=True)
-        # pds.delete_data()
-        return Response(serializer.data)
+        pds.test_func(uid)
+        try:
+            test = resultTB.objects.filter(uid=uid)
+            serializer = ResultSerializer(test, many=True)
+            # pds.delete_data(uid)
+            return Response(serializer.data)
+        except Exception:
+            raise Http404
+
+

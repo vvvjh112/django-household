@@ -10,4 +10,4 @@ class TableSerializer(serializers.ModelSerializer):
 class ResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = resultTB
-        fields = ( "id","sum1","sum2","sum3","sum4")
+        fields = ( "id","sum1","sum2","sum3","sum4","uid")

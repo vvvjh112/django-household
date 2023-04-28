@@ -20,5 +20,5 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from . import views
 urlpatterns = [
     # path('',views.TableList.as_view()),
-    path('test/<str:path>',views.TableList.as_view())
+    path('sum/<str:uid>',views.TableList.as_view())
 ]

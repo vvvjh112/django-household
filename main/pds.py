@@ -7,15 +7,10 @@ from .models import mainTB
 from .models import resultTB
 # 데이터를 읽어서 1~31일 지출 금액 합 값을 리스트에 저장하자. list[31]
 # db파일 경로 받아서 장고 모델에 저장하는 메소드 만들어야 함.
-def test_func(path):
+def test_func(uid):
 
-    # URL 변환
-    path = path.replace("12","/")
-    path = path.replace("34",":")
-    path = path.replace("56","\\")
-
-    conn = sqlite3.connect(path)
-    conn1 = pymysql.connect(
+    # conn = sqlite3.connect(path)
+    conn = pymysql.connect(
         host="sudal-ins.c6gmxfp40ais.ap-northeast-2.rds.amazonaws.com",
         port=3306,
         user='admin',
@@ -23,8 +18,11 @@ def test_func(path):
         database='main_sc',
         charset='utf8'
     )
+    curs = conn.cursor()
 
-    query = "select * from mainTB"
+    query = "select * from mainTB where uid = %s"%(uid)
+    curs.execute(query)
+    temp_data = curs.fetchall()
 
     # df = pd.read_sql_query(query, conn)
     # ss = []
@@ -33,7 +31,6 @@ def test_func(path):
     #     # Table.objects.create(id=ss[i][0], DATE=ss[i][1], ca1 = ss[i][2], ca2 = ss[i][3], ca3 = ss[i][4], ca4 = ss[i][5], caption = ss[i][6])
     #
     # # result = df[df['ID'] >0]
-    result=[]
     # name = ['ca1','ca2','ca3','ca4']
     # for i in range(0,4):
     #     result.append( df[name[i]].sum())
@@ -45,24 +42,24 @@ def test_func(path):
     # # conn.close
     # # return df.to_dict('list')
 
-
-    df = pd.read_sql_query(query,conn1 )
-    name = ['ca1', 'ca2', 'ca3', 'ca4']
-    for i in range(0,4):
-        result.append( df[name[i]].sum())
-    sql = "insert into resultTB(sum1,sum2,sum3,sum4) values(%s,%s,%s,%s)"
-    val = (result[0],result[1],result[2],result[3])
-    conn1.cursor().execute(sql,val)
-
-
-    conn1.commit()
-    conn.close
-    conn1.close()
+    if (len(temp_data)>0):
+        df = pd.read_sql_query(query,conn )
+        name = ['ca1', 'ca2', 'ca3', 'ca4']
+        result = []
+        for i in range(0,4):
+            result.append( df[name[i]].sum())
+        sql = "insert into resultTB(sum1,sum2,sum3,sum4,uid) values(%s,%s,%s,%s,%s)"
+        val = (result[0],result[1],result[2],result[3],uid)
+        curs.execute(sql,val)
 
 
-# test_func("C3456Users56lleel56Desktop56test.db")
+    conn.commit()
+    conn.close()
 
-def delete_data():
+
+
+
+def delete_data(uid):
     conn = pymysql.connect(
         host="sudal-ins.c6gmxfp40ais.ap-northeast-2.rds.amazonaws.com",
         port=3306,
@@ -71,10 +68,11 @@ def delete_data():
         database='main_sc',
         charset='utf8'
     )
-    sql = "delete from mainTB"
-    sql1 = "delete from resultTB"
-    conn.cursor().execute(sql)
-    conn.cursor().execute(sql1)
+    curs = conn.cursor()
+    sql = "delete from mainTB where uid = %s"
+    sql1 = "delete from resultTB where uid = %s"
+    curs.execute(sql)
+    curs.execute(sql1)
     conn.commit()
 
     conn.close()
