@@ -69,10 +69,16 @@ def delete_data(uid):
         charset='utf8'
     )
     curs = conn.cursor()
-    sql = "delete from mainTB where uid = %s"
-    sql1 = "delete from resultTB where uid = %s"
+    sql = "delete from mainTB where uid = %s"%(uid)
+    sql1 = "delete from resultTB where uid = %s"%(uid)
     curs.execute(sql)
     curs.execute(sql1)
+
+    sql = "alter table mainTB auto_increment = 1"
+    sql1 = "alter table resultTB auto_increment = 1"
+    curs.execute(sql)
+    curs.execute(sql1)
+
     conn.commit()
 
     conn.close()

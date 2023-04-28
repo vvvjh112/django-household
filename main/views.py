@@ -23,4 +23,14 @@ class TableList(APIView):
         except Exception:
             raise Http404
 
+class DeleteData(APIView):
+    def get(self,request,uid):
+        pds.delete_data(uid)
+        try:
+            test = resultTB.objects.filter(uid=uid)
+            serializer = ResultSerializer(test, many=True)
+            # pds.delete_data(uid)
+            return Response(serializer.data)
+        except Exception:
+            raise Http404
 
